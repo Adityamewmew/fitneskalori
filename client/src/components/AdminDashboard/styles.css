@@ -1,26 +1,114 @@
-.user-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+.admin-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
 }
 
-.user-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    background-color: var(--bg-color);
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
 }
 
-.text-sm {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+.admin-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: #1d1d1f;
 }
 
-.empty-state {
-    color: var(--text-secondary);
-    text-align: center;
-    padding: var(--spacing-xl) 0;
+.admin-header p {
+  color: #6e6e73;
+  margin: 5px 0 0 0;
+}
+
+.logout-btn {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f2f2f2;
+}
+
+.admin-tabs button {
+  padding: 10px 0;
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #86868b;
+  cursor: pointer;
+  position: relative;
+}
+
+.admin-tabs button.active {
+  color: #1d1d1f;
+}
+
+.admin-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #1d1d1f;
+}
+
+.user-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1d1d1f;
+}
+
+.user-info p {
+  margin: 2px 0 0 0;
+  color: #6e6e73;
+  font-size: 16px;
+}
+
+.user-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn {
+  background: #00897b;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 100px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #f2f2f7;
+  color: #ff3b30;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
 }

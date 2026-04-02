@@ -1,24 +1,18 @@
-import { useState, useEffect } from 'react';
-import API_BASE from '../../config';
+import React, { useState, useEffect } from 'react';
+import { API_BASE } from '../../config';
 import './styles.css';
 
-export default function AdminDashboard({ token }) {
+const AdminDashboard = ({ token, onLogout }) => {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
   const [tab, setTab] = useState('pending'); // 'pending' | 'active'
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
-      const pendingRes = await fetch(`${API_BASE}/api/admin/pending`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const activeRes = await fetch(`${API_BASE}/api/admin/active`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const [pendingRes, activeRes] = await Promise.all([
+        fetch(`${API_BASE}/api/admin/pending`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_BASE}/api/admin/active`, { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
       
       const pData = await pendingRes.json();
       const aData = await activeRes.json();
@@ -26,30 +20,36 @@ export default function AdminDashboard({ token }) {
       if (pData.success) setPendingUsers(pData.data);
       if (aData.success) setActiveUsers(aData.data);
     } catch (e) {
-      console.error(e);
+      console.error('Fetch Admin Errors:', e);
     }
   };
 
-  const approveUser = async (id) => {
+  useEffect(() => {
+    fetchData();
+  }, [token]);
+
+  const handleApprove = async (id) => {
     try {
-      await fetch(`${API_BASE}/api/admin/approve/${id}`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE}/api/admin/approve/${id}`, {
+        method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      fetchData();
+      const data = await res.json();
+      if (data.success) fetchData();
     } catch (e) {
       console.error(e);
     }
   };
 
-  const deleteUser = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm('Yakin ingin menghapus user ini?')) return;
     try {
-      await fetch(`${API_BASE}/api/admin/${id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      fetchData();
+      const data = await res.json();
+      if (data.success) fetchData();
     } catch (e) {
       console.error(e);
     }
@@ -57,52 +57,57 @@ export default function AdminDashboard({ token }) {
 
   return (
     <div className="admin-container">
-      <div className="tabs">
+      <div className="admin-header">
+        <div>
+          <h1>SUPER ADMIN</h1>
+          <p>admin@fitness.com</p>
+        </div>
+        <button className="logout-btn" onClick={onLogout}>Logout</button>
+      </div>
+
+      <div className="admin-tabs">
         <button 
-            className={`tab ${tab === 'pending' ? 'active' : ''}`} 
-            onClick={() => setTab('pending')}
+          className={tab === 'pending' ? 'active' : ''} 
+          onClick={() => setTab('pending')}
         >
-            Pending ({pendingUsers.length})
+          Pending ({pendingUsers.length})
         </button>
         <button 
-            className={`tab ${tab === 'active' ? 'active' : ''}`} 
-            onClick={() => setTab('active')}
+          className={tab === 'active' ? 'active' : ''} 
+          onClick={() => setTab('active')}
         >
-            Active ({activeUsers.length})
+          Active ({activeUsers.length})
         </button>
       </div>
 
-      <div className="card">
-        {tab === 'pending' && (
-            <div className="user-list">
-              {pendingUsers.length === 0 ? <p className="empty-state">Tidak ada user pending.</p> : null}
-              {pendingUsers.map(u => (
-                <div key={u.id} className="user-item">
-                  <div>
-                    <strong>{u.full_name || 'No Name'}</strong>
-                    <div className="text-sm">{u.email}</div>
-                  </div>
-                  <button className="primary" onClick={() => handleApprove(u.id)}>Approve</button>
-                </div>
-              ))}
+      <div className="user-list">
+        {tab === 'pending' ? (
+          pendingUsers.map(u => (
+            <div key={u.id} className="user-card">
+              <div className="user-info">
+                <h3>{u.full_name}</h3>
+                <p>{u.email}</p>
+              </div>
+              <div className="user-actions">
+                <button className="approve-btn" onClick={() => handleApprove(u.id)}>Approve</button>
+                <button className="delete-btn" onClick={() => handleDelete(u.id)}>Delete</button>
+              </div>
             </div>
-        )}
-
-        {tab === 'active' && (
-            <div className="user-list">
-              {activeUsers.length === 0 ? <p className="empty-state">Tidak ada user aktif.</p> : null}
-              {activeUsers.map(u => (
-                <div key={u.id} className="user-item">
-                  <div>
-                    <strong>{u.full_name || 'No Name'}</strong>
-                    <div className="text-sm">{u.email}</div>
-                  </div>
-                  <button onClick={() => handleDelete(u.id)} style={{color: '#991B1B', borderColor: '#FCA5A5'}}>Delete</button>
-                </div>
-              ))}
+          ))
+        ) : (
+          activeUsers.map(u => (
+            <div key={u.id} className="user-card">
+              <div className="user-info">
+                <h3>{u.full_name}</h3>
+                <p>{u.email}</p>
+              </div>
+              <button className="delete-btn" onClick={() => handleDelete(u.id)}>Delete Account</button>
             </div>
+          ))
         )}
       </div>
     </div>
   );
-}
+};
+
+export default AdminDashboard;
