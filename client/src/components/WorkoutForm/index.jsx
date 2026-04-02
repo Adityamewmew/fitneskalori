@@ -1,138 +1,117 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { API_BASE } from '../../config';
 import './styles.css';
-import API_BASE from '../../config';
 
-export default function WorkoutForm({ token, onSuccess, initialData }) {
-  const [type, setType] = useState(initialData?.type || 'cardio'); // cardio | hypertrophy
-
-  // Cardio fields
+const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
+  const [type, setType] = useState(initialData?.type || 'cardio');
+  const [targetDate, setTargetDate] = useState(initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : '');
+  const [movement, setMovement] = useState(initialData?.movement || '');
+  const [sets, setSets] = useState(initialData?.sets || '');
+  const [reps, setReps] = useState(initialData?.reps || '');
+  const [weight, setWeight] = useState(initialData?.weight || '');
   const [steps, setSteps] = useState(initialData?.steps || '');
   const [caloriesBurned, setCaloriesBurned] = useState(initialData?.calories_burned || '');
   const [duration, setDuration] = useState(initialData?.duration || '');
   const [distance, setDistance] = useState(initialData?.distance || '');
 
-  // Hypertrophy fields
-  const [movement, setMovement] = useState(initialData?.movement_name || '');
-  const [sets, setSets] = useState(initialData?.sets || '');
-  const [reps, setReps] = useState(initialData?.reps || '');
-  const [weight, setWeight] = useState(initialData?.weight_kg || '');
-
-  const [loading, setLoading] = useState(false);
-  const [targetDate, setTargetDate] = useState(initialData?.created_at ? new Date(initialData.created_at).toISOString().split('T')[0] : '');
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    const url = initialData 
+      ? `${API_BASE}/api/tracking/workout/${initialData.id}`
+      : `${API_BASE}/api/tracking/workout`;
+    
+    const method = initialData ? 'PUT' : 'POST';
 
-    const payload = { type };
-    if (targetDate) payload.created_at = new Date(targetDate).toISOString();
-    if (type === 'cardio') {
-      Object.assign(payload, {
-        steps: parseInt(steps) || 0,
-        calories_burned: parseFloat(caloriesBurned) || 0,
-        duration: parseInt(duration) || 0,
-        distance: parseFloat(distance) || 0
-      });
-    } else {
-      Object.assign(payload, {
-        movement_name: movement,
-        sets: parseInt(sets) || 0,
-        reps: parseInt(reps) || 0,
-        weight_kg: parseFloat(weight) || 0
-      });
-    }
+    const body = type === 'cardio' 
+      ? { type, date: targetDate || undefined, steps: Number(steps), calories_burned: Number(caloriesBurned), duration: Number(duration), distance: Number(distance) }
+      : { type, date: targetDate || undefined, movement, sets: Number(sets), reps: Number(reps), weight: Number(weight) };
 
     try {
-      const url = initialData
-        ? `${API_BASE}/api/tracking/workouts/${initialData.id}`
-        : `${API_BASE}/api/tracking/workouts`;
-
       const res = await fetch(url, {
-        method: initialData ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body)
       });
-      const data = await res.json();
-      if (data.success) {
-        // Reset forms
-        setSteps(''); setCaloriesBurned(''); setDuration(''); setDistance('');
-        setMovement(''); setSets(''); setReps(''); setWeight('');
-        if (onSuccess) onSuccess();
-      } else {
-        alert(data.message);
+      if (res.ok) {
+        onSuccess();
+        onClose();
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h3 style={{ fontSize: '1rem', marginBottom: '0', color: 'var(--text-primary)' }}>
-        {initialData ? 'Edit Latihan' : 'Tambah Latihan'}
-      </h3>
-      <div className="input-group" style={{ marginTop: '12px' }}>
-        <label>Tipe Latihan</label>
-        <select value={type} onChange={e => setType(e.target.value)}>
-          <option value="cardio">Cardio</option>
-          <option value="hypertrophy">Gym (Hypertrophy)</option>
-        </select>
-      </div>
+    <div className="overlay-form" onClick={(e) => e.target.className === 'overlay-form' && onClose()}>
+      <div className="form-container">
+        <div className="form-header">
+          <h2>{initialData ? 'Edit Latihan' : 'Tambah Latihan'}</h2>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
 
-      <div className="input-group">
-        <label>Tanggal Latihan (Opsional)</label>
-        <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} onClick={e => e.target.showPicker && e.target.showPicker()} />
-      </div>
+        <div className="form-content">
+          <div className="form-group">
+            <label>TIPE LATIHAN</label>
+            <select value={type} onChange={e => setType(e.target.value)}>
+              <option value="cardio">Cardio / Steps</option>
+              <option value="hypertrophy">Gym (Sets/Reps)</option>
+            </select>
+          </div>
 
-      <form onSubmit={handleSubmit}>
-        {type === 'cardio' ? (
-          <>
-            <div className="input-group">
-              <label>Langkah (Steps)</label>
-              <input type="number" value={steps} onChange={e => setSteps(e.target.value)} />
-            </div>
-            <div className="input-group">
-              <label>Kalori Terbakar (kcal)</label>
-              <input type="number" value={caloriesBurned} onChange={e => setCaloriesBurned(e.target.value)} />
-            </div>
-            <div className="input-group">
-              <label>Durasi</label>
-              <input type="number" value={duration} onChange={e => setDuration(e.target.value)} />
-            </div>
-            <div className="input-group">
-              <label>Jarak (Km)</label>
-              <input type="number" step="0.1" value={distance} onChange={e => setDistance(e.target.value)} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="input-group">
-              <label>Nama Gerakan</label>
-              <input type="text" value={movement} onChange={e => setMovement(e.target.value)} required placeholder="mis. Squad, Bench Press" />
-            </div>
-            <div className="input-group">
-              <label>Set</label>
-              <input type="number" value={sets} onChange={e => setSets(e.target.value)} required />
-            </div>
-            <div className="input-group">
-              <label>Reps</label>
-              <input type="number" value={reps} onChange={e => setReps(e.target.value)} required />
-            </div>
-            <div className="input-group">
-              <label>Beban (Kg)</label>
-              <input type="number" step="0.1" value={weight} onChange={e => setWeight(e.target.value)} required />
-            </div>
-          </>
-        )}
-        <button type="submit" className="primary" style={{ width: '100%', marginTop: '16px' }} disabled={loading}>
-          Simpan Latihan
-        </button>
-      </form>
+          <div className="form-group">
+            <label>TANGGAL (OPSIONAL)</label>
+            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} />
+          </div>
+
+          {type === 'cardio' ? (
+            <>
+              <div className="form-group">
+                <label>LANGKAH (STEPS)</label>
+                <input type="number" value={steps} onChange={e => setSteps(e.target.value)} placeholder="0" />
+              </div>
+              <div className="form-group">
+                <label>KALORI (KCAL)</label>
+                <input type="number" value={caloriesBurned} onChange={e => setCaloriesBurned(e.target.value)} placeholder="0" />
+              </div>
+              <div className="form-group">
+                <label>DURASI (MENIT)</label>
+                <input type="number" value={duration} onChange={e => setDuration(e.target.value)} placeholder="0" />
+              </div>
+              <div className="form-group">
+                <label>JARAK (KM)</label>
+                <input type="number" step="0.1" value={distance} onChange={e => setDistance(e.target.value)} placeholder="0.0" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="form-group">
+                <label>NAMA GERAKAN</label>
+                <input type="text" value={movement} onChange={e => setMovement(e.target.value)} placeholder="mis. Bench Press" required />
+              </div>
+              <div className="form-group">
+                <label>SET</label>
+                <input type="number" value={sets} onChange={e => setSets(e.target.value)} placeholder="0" required />
+              </div>
+              <div className="form-group">
+                <label>REPS</label>
+                <input type="number" value={reps} onChange={e => setReps(e.target.value)} placeholder="0" required />
+              </div>
+              <div className="form-group">
+                <label>BEBAN (KG)</label>
+                <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="0" />
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="form-footer">
+          <button className="submit-btn" onClick={handleSubmit}>
+            {initialData ? 'Simpan Perubahan' : 'Tambah Latihan'}
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default WorkoutForm;

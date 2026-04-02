@@ -1,78 +1,68 @@
-import { useState } from 'react';
-import './styles.css';
-import API_BASE from '../../config';
+import React, { useState } from 'react';
+import { API_BASE } from '../../config';
+import '../WorkoutForm/styles.css'; // Gunakan CSS yang sama agar konsisten
 
-export default function CalorieForm({ token, onSuccess, initialData }) {
+const CalorieForm = ({ token, onSuccess, onClose, initialData = null }) => {
   const [foodName, setFoodName] = useState(initialData?.food_name || '');
   const [calories, setCalories] = useState(initialData?.calories || '');
-  const [mealTime, setMealTime] = useState(initialData?.meal_time || '');
-  const [targetDate, setTargetDate] = useState(initialData?.created_at ? new Date(initialData.created_at).toISOString().split('T')[0] : '');
-  const [loading, setLoading] = useState(false);
+  const [targetDate, setTargetDate] = useState(initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    const url = initialData 
+      ? `${API_BASE}/api/tracking/nutrition/${initialData.id}`
+      : `${API_BASE}/api/tracking/nutrition`;
+    
+    const method = initialData ? 'PUT' : 'POST';
+
     try {
-      const payload = {
-        food_name: foodName,
-        calories: parseFloat(calories),
-        meal_time: mealTime || new Date().toLocaleTimeString('en-US', { hour12: false })
-      };
-      if (targetDate) payload.created_at = new Date(targetDate).toISOString();
-
-      const url = initialData
-        ? `${API_BASE}/api/tracking/calories/${initialData.id}`
-        : `${API_BASE}/api/tracking/calories`;
-
       const res = await fetch(url, {
-        method: initialData ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ food_name: foodName, calories: Number(calories), date: targetDate || undefined })
       });
-      const data = await res.json();
-      if (data.success) {
-        setFoodName('');
-        setCalories('');
-        setMealTime('');
-        if (onSuccess) onSuccess();
-      } else {
-        alert(data.message);
+      if (res.ok) {
+        onSuccess();
+        onClose();
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h3 style={{ fontSize: '1rem', marginBottom: '0', color: 'var(--text-primary)' }}>
-        {initialData ? 'Edit Kalori' : 'Tambah Kalori'}
-      </h3>
-      <form onSubmit={handleSubmit} style={{ marginTop: '12px' }}>
-        <div className="input-group">
-          <label>Nama Makanan</label>
-          <input type="text" value={foodName} onChange={e => setFoodName(e.target.value)} required />
+    <div className="overlay-form" onClick={(e) => e.target.className === 'overlay-form' && onClose()}>
+      <div className="form-container">
+        <div className="form-header">
+          <h2>{initialData ? 'Edit Nutrisi' : 'Tambah Nutrisi'}</h2>
+          <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        <div className="input-group">
-          <label>Kalori (kcal)</label>
-          <input type="number" value={calories} onChange={e => setCalories(e.target.value)} required />
-        </div>
-        <div className="input-group">
-          <label>Tanggal & Waktu Input (Opsional)</label>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} onClick={e => e.target.showPicker && e.target.showPicker()} style={{ flex: 1 }} />
-            <input type="time" value={mealTime} onChange={e => setMealTime(e.target.value)} onClick={e => e.target.showPicker && e.target.showPicker()} required style={{ flex: 1 }} />
+
+        <div className="form-content">
+          <div className="form-group">
+            <label>NAMA MAKANAN / MINUMAN</label>
+            <input type="text" value={foodName} onChange={e => setFoodName(e.target.value)} placeholder="mis. Nasi Goreng" required />
+          </div>
+
+          <div className="form-group">
+            <label>KALORI (KCAL)</label>
+            <input type="number" value={calories} onChange={e => setCalories(e.target.value)} placeholder="0" required />
+          </div>
+
+          <div className="form-group">
+            <label>TANGGAL (OPSIONAL)</label>
+            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} />
           </div>
         </div>
-        <button type="submit" className="primary" style={{ width: '100%', marginTop: '16px' }} disabled={loading}>
-          Simpan Kalori
-        </button>
-      </form>
+
+        <div className="form-footer">
+          <button className="submit-btn" onClick={handleSubmit}>
+            {initialData ? 'Simpan Perubahan' : 'Tambah Nutrisi'}
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default CalorieForm;
