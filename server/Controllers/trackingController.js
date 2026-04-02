@@ -3,7 +3,8 @@ const supabase = require('../config/supabaseClient');
 const addCalorie = async (req, res) => {
     const { food_name, calories, meal_time, created_at } = req.body;
     
-    const payload = { user_id: req.user.id, food_name, calories, meal_time };
+    const payload = { user_id: req.user.id, food_name, calories };
+    if (meal_time) payload.meal_time = meal_time;
     if (created_at) payload.created_at = created_at;
 
     const { data, error } = await supabase
@@ -58,7 +59,8 @@ const getWorkouts = async (req, res) => {
 const updateCalorie = async (req, res) => {
     const { id } = req.params;
     const { food_name, calories, meal_time, created_at } = req.body;
-    const updates = { food_name, calories, meal_time };
+    const updates = { food_name, calories };
+    if (meal_time) updates.meal_time = meal_time;
     if (created_at) updates.created_at = created_at;
 
     const { data, error } = await supabase
