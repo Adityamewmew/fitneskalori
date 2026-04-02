@@ -461,9 +461,9 @@ export default function UserDashboard({ token }) {
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => { setIsModalOpen(false); setIsEditingItem(false); setSelectedItem(null); }}>
           <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet-handle"></div>
             
             {!isEditingItem && (
+
               <div className="modal-tabs">
                   <button className={`modal-tab ${modalType === 'calorie' ? 'active' : ''}`} onClick={() => setModalType('calorie')}>NUTRITION</button>
                   <button className={`modal-tab ${modalType === 'workout' ? 'active' : ''}`} onClick={() => setModalType('workout')}>TRAINING</button>
@@ -475,14 +475,17 @@ export default function UserDashboard({ token }) {
                   token={token} 
                   initialData={isEditingItem ? selectedItem?.data : null}
                   onSuccess={() => { setIsModalOpen(false); setIsEditingItem(false); setSelectedItem(null); fetchData(); }} 
+                  onClose={() => { setIsModalOpen(false); setIsEditingItem(false); setSelectedItem(null); }}
                 />
             ) : (
                 <CalorieForm 
                   token={token} 
                   initialData={isEditingItem ? selectedItem?.data : null}
                   onSuccess={() => { setIsModalOpen(false); setIsEditingItem(false); setSelectedItem(null); fetchData(); }} 
+                  onClose={() => { setIsModalOpen(false); setIsEditingItem(false); setSelectedItem(null); }}
                 />
             )}
+
           </div>
         </div>
       )}

@@ -15,54 +15,42 @@ const CalorieForm = ({ token, onSuccess, onClose, initialData = null }) => {
     
     const method = initialData ? 'PUT' : 'POST';
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ food_name: foodName, calories: Number(calories), date: targetDate || undefined })
-      });
-      if (res.ok) {
-        onSuccess();
-        onClose();
-      }
-    } catch (err) {
-      console.error(err);
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ food_name: foodName, calories: Number(calories), date: targetDate || undefined })
+    });
+    if (res.ok) {
+      onSuccess();
+      onClose();
     }
   };
 
   return (
-    <div className="overlay-form" onClick={(e) => e.target.className === 'overlay-form' && onClose()}>
-      <div className="form-container">
-        <div className="form-header">
-          <h2>{initialData ? 'Edit Nutrisi' : 'Tambah Nutrisi'}</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
-
-        <div className="form-content">
-          <div className="form-group">
-            <label>NAMA MAKANAN / MINUMAN</label>
-            <input type="text" value={foodName} onChange={e => setFoodName(e.target.value)} placeholder="mis. Nasi Goreng" required />
-          </div>
-
-          <div className="form-group">
-            <label>KALORI (KCAL)</label>
-            <input type="number" value={calories} onChange={e => setCalories(e.target.value)} placeholder="0" required />
-          </div>
-
-          <div className="form-group">
-            <label>TANGGAL (OPSIONAL)</label>
-            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} />
-          </div>
-        </div>
-
-        <div className="form-footer">
-          <button className="submit-btn" onClick={handleSubmit}>
-            {initialData ? 'Simpan Perubahan' : 'Tambah Nutrisi'}
-          </button>
-        </div>
+    <div className="form-container">
+      <div className="form-header">
+        <h2>{initialData ? 'Ubah Nutrisi' : 'Tambah Nutrisi'}</h2>
       </div>
+
+      <div className="form-field">
+        <label>NAMA MAKANAN / MINUMAN</label>
+        <input type="text" value={foodName} onChange={e => setFoodName(e.target.value)} placeholder="mis. Nasi Goreng" required />
+      </div>
+
+      <div className="form-field">
+        <label>KALORI (KCAL)</label>
+        <input type="number" value={calories} onChange={e => setCalories(e.target.value)} placeholder="0" required />
+      </div>
+
+      <div className="form-field">
+        <label>TANGGAL (OPSIONAL)</label>
+        <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} />
+      </div>
+
+      <button className="form-submit" onClick={handleSubmit}>Simpan Nutrisi</button>
     </div>
   );
 };
+
 
 export default CalorieForm;

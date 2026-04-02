@@ -1,117 +1,80 @@
-.overlay-form {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  z-index: 10000;
-  display: flex;
-  align-items: flex-end; /* Memunculkan dari bawah di mobile */
-  justify-content: center;
-}
-
 .form-container {
-  background: #ffffff;
   width: 100%;
-  max-width: 500px;
-  max-height: 90vh; /* Hampir penuh tapi aman */
-  border-radius: 32px 32px 0 0; /* Bulat di atas saja */
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
-  animation: slideUp 0.3s ease-out;
-}
-
-@media (min-width: 768px) {
-  .overlay-form {
-    align-items: center;
-  }
-  .form-container {
-    border-radius: 32px;
-    max-height: 80vh;
-  }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  padding: 8px 0;
 }
 
 .form-header {
-  padding: 20px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #f2f2f7;
+  margin-bottom: 24px;
 }
 
 .form-header h2 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1d1d1f;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
 
-.form-content {
-  padding: 10px 24px 30px;
-  overflow-y: auto;
-  flex: 1;
-  -webkit-overflow-scrolling: touch;
+.form-field {
+  margin-bottom: 16px;
 }
 
-.form-group {
-  margin-top: 20px;
-}
-
-.form-group label {
+.form-field label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #86868b;
-  margin-bottom: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.form-group input,
-.form-group select {
+.form-field input, 
+.form-field select {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #d2d2d7;
-  border-radius: 14px;
-  font-size: 16px;
-  background: #fbfbfd;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: rgba(var(--surface-rgb), 0.5);
+  color: var(--text-primary);
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
-.form-footer {
-  padding: 20px 24px calc(20px + env(safe-area-inset-bottom)); /* Tambahan padding untuk iPhone */
-  border-top: 1px solid #f2f2f7;
-  background: white;
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: var(--glass-bg);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
 }
 
-.submit-btn {
+.form-submit {
   width: 100%;
   padding: 16px;
-  background: #00897b;
-  color: white;
+  background: var(--accent-color);
+  color: #000;
   border: none;
-  border-radius: 16px;
-  font-size: 17px;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-top: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.close-btn {
-  background: #f2f2f7;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  font-size: 20px;
-  color: #0071e3;
-  cursor: pointer;
+
+.form-submit:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.form-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
+}
+
+.form-row > div {
+  flex: 1;
 }
