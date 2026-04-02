@@ -7,20 +7,20 @@ const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
   const [targetDate, setTargetDate] = useState(initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : '');
   const [steps, setSteps] = useState(initialData?.steps || '');
   const [caloriesBurned, setCaloriesBurned] = useState(initialData?.calories_burned || '');
-  const [movement, setMovement] = useState(initialData?.movement || '');
+  const [movement, setMovement] = useState(initialData?.movement_name || '');
   const [sets, setSets] = useState(initialData?.sets || '');
   const [reps, setReps] = useState(initialData?.reps || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = initialData 
-      ? `${API_BASE}/api/tracking/workout/${initialData.id}`
-      : `${API_BASE}/api/tracking/workout`;
+      ? `${API_BASE}/api/tracking/workouts/${initialData.id}`
+      : `${API_BASE}/api/tracking/workouts`;
     const method = initialData ? 'PUT' : 'POST';
 
     const body = type === 'cardio' 
-      ? { type, date: targetDate || undefined, steps: Number(steps), calories_burned: Number(caloriesBurned) }
-      : { type, date: targetDate || undefined, movement, sets: Number(sets), reps: Number(reps) };
+      ? { type, created_at: targetDate || undefined, steps: Number(steps), calories_burned: Number(caloriesBurned) }
+      : { type, created_at: targetDate || undefined, movement_name: movement, sets: Number(sets), reps: Number(reps) };
 
     const res = await fetch(url, {
       method,

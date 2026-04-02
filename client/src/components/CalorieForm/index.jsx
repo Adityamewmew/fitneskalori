@@ -10,15 +10,19 @@ const CalorieForm = ({ token, onSuccess, onClose, initialData = null }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = initialData 
-      ? `${API_BASE}/api/tracking/nutrition/${initialData.id}`
-      : `${API_BASE}/api/tracking/nutrition`;
+      ? `${API_BASE}/api/tracking/calories/${initialData.id}`
+      : `${API_BASE}/api/tracking/calories`;
     
     const method = initialData ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ food_name: foodName, calories: Number(calories), date: targetDate || undefined })
+      body: JSON.stringify({ 
+        food_name: foodName, 
+        calories: Number(calories), 
+        created_at: targetDate || undefined 
+      })
     });
     if (res.ok) {
       onSuccess();

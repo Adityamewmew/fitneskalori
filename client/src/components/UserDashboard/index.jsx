@@ -120,7 +120,7 @@ export default function UserDashboard({ token }) {
       setStreakData({ streak: newStreak, checkedInToday: true });
       
       try {
-         await fetch('http://localhost:5000/api/auth/profile/update', {
+         await fetch(`${API_BASE}/api/auth/profile/update`, {
              method: 'PUT',
              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
              body: JSON.stringify({ streak_count: newStreak, last_checkin: todayStr })
@@ -135,7 +135,7 @@ export default function UserDashboard({ token }) {
          setBodyWeight(weightInput);
          setIsEditingWeight(false);
          try {
-             await fetch('http://localhost:5000/api/auth/profile/update', {
+             await fetch(`${API_BASE}/api/auth/profile/update`, {
                  method: 'PUT',
                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                  body: JSON.stringify({ weight_kg: numWeight })
