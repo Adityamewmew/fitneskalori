@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_BASE } from '../../config';
+import API_BASE from '../../config';
 import '../WorkoutForm/styles.css'; // Gunakan CSS yang sama agar konsisten
 
 const CalorieForm = ({ token, onSuccess, onClose, initialData = null }) => {

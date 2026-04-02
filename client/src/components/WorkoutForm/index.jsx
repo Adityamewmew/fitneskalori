@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_BASE } from '../../config';
+import API_BASE from '../../config';
 import './styles.css';
 
 const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
