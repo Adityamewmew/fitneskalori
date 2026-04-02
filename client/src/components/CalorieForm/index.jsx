@@ -15,18 +15,25 @@ const CalorieForm = ({ token, onSuccess, onClose, initialData = null }) => {
     
     const method = initialData ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ 
-        food_name: foodName, 
-        calories: Number(calories), 
-        created_at: targetDate || undefined 
-      })
-    });
-    if (res.ok) {
-      onSuccess();
-      onClose();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ 
+          food_name: foodName, 
+          calories: Number(calories), 
+          created_at: targetDate || undefined 
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        onSuccess();
+        onClose();
+      } else {
+        alert('Gagal menyimpan nutrisi: ' + (data.message || 'Error tidak diketahui'));
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan jaringan: ' + err.message);
     }
   };
 

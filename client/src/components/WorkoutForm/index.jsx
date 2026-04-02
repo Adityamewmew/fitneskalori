@@ -10,6 +10,7 @@ const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
   const [movement, setMovement] = useState(initialData?.movement_name || '');
   const [sets, setSets] = useState(initialData?.sets || '');
   const [reps, setReps] = useState(initialData?.reps || '');
+  const [weight, setWeight] = useState(initialData?.weight_kg || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,16 +21,23 @@ const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
 
     const body = type === 'cardio' 
       ? { type, created_at: targetDate || undefined, steps: Number(steps), calories_burned: Number(caloriesBurned) }
-      : { type, created_at: targetDate || undefined, movement_name: movement, sets: Number(sets), reps: Number(reps) };
+      : { type, created_at: targetDate || undefined, movement_name: movement, sets: Number(sets), reps: Number(reps), weight_kg: Number(weight) };
 
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      onSuccess();
-      onClose();
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        onSuccess();
+        onClose();
+      } else {
+        alert('Gagal menyimpan: ' + (data.message || 'Error tidak diketahui'));
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan jaringan: ' + err.message);
     }
   };
 
@@ -75,6 +83,10 @@ const WorkoutForm = ({ token, onSuccess, onClose, initialData = null }) => {
               <input type="number" value={sets} onChange={e => setSets(e.target.value)} placeholder="Sets" />
               <input type="number" value={reps} onChange={e => setReps(e.target.value)} placeholder="Reps" />
             </div>
+          </div>
+          <div className="form-field">
+            <label>BEBAN (KG)</label>
+            <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="0" />
           </div>
         </>
       )}
