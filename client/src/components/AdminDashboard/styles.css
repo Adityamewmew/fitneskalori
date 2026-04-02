@@ -1,0 +1,26 @@
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background-color: var(--bg-color);
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
