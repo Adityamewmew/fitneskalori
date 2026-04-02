@@ -2,36 +2,45 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  z-index: 9999; /* Sangat tinggi agar di atas bottom-nav */
+  backdrop-filter: blur(8px);
+  z-index: 10000;
   display: flex;
-  align-items: center; /* Di tengah tengah */
+  align-items: flex-end; /* Memunculkan dari bawah di mobile */
   justify-content: center;
-  overflow: hidden; /* Prevent body scroll */
 }
 
 .form-container {
   background: #ffffff;
-  width: 90%;
-  max-width: 450px;
-  max-height: 85vh; /* Batasin tingginya */
-  border-radius: 32px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh; /* Hampir penuh tapi aman */
+  border-radius: 32px 32px 0 0; /* Bulat di atas saja */
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@media (min-width: 768px) {
+  .overlay-form {
+    align-items: center;
+  }
+  .form-container {
+    border-radius: 32px;
+    max-height: 80vh;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
 .form-header {
-  padding: 24px 24px 16px;
+  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,20 +49,20 @@
 
 .form-header h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #1d1d1f;
 }
 
 .form-content {
-  padding: 0 24px 24px;
-  overflow-y: auto; /* Aktifkan scroll di sini saja */
+  padding: 10px 24px 30px;
+  overflow-y: auto;
   flex: 1;
   -webkit-overflow-scrolling: touch;
 }
 
 .form-group {
-  margin: 20px 0;
+  margin-top: 20px;
 }
 
 .form-group label {
@@ -62,7 +71,6 @@
   font-weight: 600;
   color: #86868b;
   margin-bottom: 8px;
-  text-transform: uppercase;
 }
 
 .form-group input,
@@ -77,8 +85,9 @@
 }
 
 .form-footer {
-  padding: 20px 24px;
+  padding: 20px 24px calc(20px + env(safe-area-inset-bottom)); /* Tambahan padding untuk iPhone */
   border-top: 1px solid #f2f2f7;
+  background: white;
 }
 
 .submit-btn {
@@ -91,7 +100,6 @@
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .close-btn {
@@ -101,5 +109,9 @@
   height: 36px;
   border-radius: 18px;
   font-size: 20px;
+  color: #0071e3;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
